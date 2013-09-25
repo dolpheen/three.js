@@ -22,7 +22,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
-	_clearAlpha = 0;
+	_clearAlpha = 0,
+	
+	_forceAttrib0ToPosition = parameters.forceAttrib0ToPosition !== undefined ? parameters.forceAttrib0ToPosition : false;
 
 	// public properties
 
@@ -4152,7 +4154,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		};
 
-		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters, material.index0AttributeName );
+		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters );
 
 		var attributes = material.program.attributes;
 
@@ -5404,7 +5406,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Shaders
 
-	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters, index0AttributeName ) {
+	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
 
 		var p, pl, d, program, code;
 		var chunks = [];
@@ -5635,11 +5637,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
 
-		//Force a particular attribute to index 0.
+		// Force a "position" attribute to index 0.
 		// because potentially expensive emulation is done by browser if attribute 0 is disabled.
-		//And, color, for example is often automatically bound to index 0 so disabling it
-		if ( index0AttributeName ) {
-			_gl.bindAttribLocation( program, 0, index0AttributeName );
+		
+		if ( _forceAttrib0ToPosition ) {
+			_gl.bindAttribLocation( program, 0, "position");
 		}
 
 		_gl.linkProgram( program );
